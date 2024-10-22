@@ -20,17 +20,17 @@ import android.graphics.RectF;
 
 public class PagePart {
 
-    private int userPage;
+    private final int userPage;
 
-    private int page;
+    private final int page;
 
-    private Bitmap renderedBitmap;
+    private final Bitmap renderedBitmap;
 
     private float width, height;
 
-    private RectF pageRelativeBounds;
+    private final RectF pageRelativeBounds;
 
-    private boolean thumbnail;
+    private final boolean thumbnail;
 
     private int cacheOrder;
 
@@ -46,6 +46,10 @@ public class PagePart {
 
     public int getCacheOrder() {
         return cacheOrder;
+    }
+
+    public void setCacheOrder(int cacheOrder) {
+        this.cacheOrder = cacheOrder;
     }
 
     public int getPage() {
@@ -76,17 +80,12 @@ public class PagePart {
         return thumbnail;
     }
 
-    public void setCacheOrder(int cacheOrder) {
-        this.cacheOrder = cacheOrder;
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof PagePart)) {
+        if (!(obj instanceof PagePart part)) {
             return false;
         }
 
-        PagePart part = (PagePart) obj;
         return part.getPage() == page
                 && part.getUserPage() == userPage
                 && part.getWidth() == width

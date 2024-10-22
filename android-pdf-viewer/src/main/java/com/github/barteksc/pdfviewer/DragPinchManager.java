@@ -15,17 +15,17 @@
  */
 package com.github.barteksc.pdfviewer;
 
+import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MAXIMUM_ZOOM;
+import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MINIMUM_ZOOM;
+
 import android.graphics.PointF;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
-
-import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MAXIMUM_ZOOM;
-import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MINIMUM_ZOOM;
+import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 
 /**
  * This Manager takes care of moving the PDFView,
@@ -33,11 +33,11 @@ import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MINIMUM_ZOOM;
  */
 class DragPinchManager implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, ScaleGestureDetector.OnScaleGestureListener, View.OnTouchListener {
 
-    private PDFView pdfView;
-    private AnimationManager animationManager;
+    private final PDFView pdfView;
+    private final AnimationManager animationManager;
 
-    private GestureDetector gestureDetector;
-    private ScaleGestureDetector scaleGestureDetector;
+    private final GestureDetector gestureDetector;
+    private final ScaleGestureDetector scaleGestureDetector;
 
     private boolean isSwipeEnabled;
 

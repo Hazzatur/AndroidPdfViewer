@@ -51,14 +51,11 @@ import java.util.List;
 public class PDFViewActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener,
         OnPageErrorListener {
 
-    private static final String TAG = PDFViewActivity.class.getSimpleName();
-
-    private final static int REQUEST_CODE = 42;
     public static final int PERMISSION_CODE = 42042;
-
     public static final String SAMPLE_FILE = "sample.pdf";
     public static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
-
+    private static final String TAG = PDFViewActivity.class.getSimpleName();
+    private final static int REQUEST_CODE = 42;
     @ViewById
     PDFView pdfView;
 
@@ -207,7 +204,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
      * @param grantResults Whether permissions granted
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_CODE) {
             if (grantResults.length > 0

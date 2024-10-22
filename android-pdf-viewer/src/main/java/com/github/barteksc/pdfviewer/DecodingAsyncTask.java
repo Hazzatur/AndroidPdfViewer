@@ -26,14 +26,14 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
 
     private boolean cancelled;
 
-    private PDFView pdfView;
+    private final PDFView pdfView;
 
-    private Context context;
-    private PdfiumCore pdfiumCore;
+    private final Context context;
+    private final PdfiumCore pdfiumCore;
     private PdfDocument pdfDocument;
-    private String password;
-    private DocumentSource docSource;
-    private int firstPageIdx;
+    private final String password;
+    private final DocumentSource docSource;
+    private final int firstPageIdx;
     private int pageWidth;
     private int pageHeight;
 

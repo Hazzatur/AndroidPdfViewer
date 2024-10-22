@@ -82,218 +82,162 @@ import java.util.List;
  */
 public class PDFView extends RelativeLayout {
 
-    private static final String TAG = PDFView.class.getSimpleName();
-
     public static final float DEFAULT_MAX_SCALE = 3.0f;
     public static final float DEFAULT_MID_SCALE = 1.75f;
     public static final float DEFAULT_MIN_SCALE = 1.0f;
-
-    private float minZoom = DEFAULT_MIN_SCALE;
-    private float midZoom = DEFAULT_MID_SCALE;
-    private float maxZoom = DEFAULT_MAX_SCALE;
-
+    private static final String TAG = PDFView.class.getSimpleName();
     /**
-     * START - scrolling in first page direction
-     * END - scrolling in last page direction
-     * NONE - not scrolling
+     * The thread {@link #renderingHandler} will run on
      */
-    enum ScrollDir {
-        NONE, START, END
-    }
-
-    private ScrollDir scrollDir = ScrollDir.NONE;
-
+    private final HandlerThread renderingHandlerThread;
     /**
      * Rendered parts go to the cache manager
      */
     CacheManager cacheManager;
-
+    /**
+     * Handler always waiting in the background and rendering tasks
+     */
+    RenderingHandler renderingHandler;
+    private float minZoom = DEFAULT_MIN_SCALE;
+    private float midZoom = DEFAULT_MID_SCALE;
+    private float maxZoom = DEFAULT_MAX_SCALE;
+    private ScrollDir scrollDir = ScrollDir.NONE;
     /**
      * Animation manager manage all offset and zoom animation
      */
     private AnimationManager animationManager;
-
     /**
      * Drag manager manage all touch events
      */
     private DragPinchManager dragPinchManager;
-
     /**
      * The pages the user want to display in order
      * (ex: 0, 2, 2, 8, 8, 1, 1, 1)
      */
     private int[] originalUserPages;
-
     /**
      * The same pages but with a filter to avoid repetition
      * (ex: 0, 2, 8, 1)
      */
     private int[] filteredUserPages;
-
     /**
      * The same pages but with a filter to avoid repetition
      * (ex: 0, 1, 1, 2, 2, 3, 3, 3)
      */
     private int[] filteredUserPageIndexes;
-
     /**
      * Number of pages in the loaded PDF document
      */
     private int documentPageCount;
-
     /**
      * The index of the current sequence
      */
     private int currentPage;
-
     /**
      * The index of the current sequence
      */
     private int currentFilteredPage;
-
     /**
      * The actual width and height of the pages in the PDF document
      */
     private int pageWidth, pageHeight;
-
     /**
      * The optimal width and height of the pages to fit the component size
      */
     private float optimalPageWidth, optimalPageHeight;
-
     /**
      * If you picture all the pages side by side in their optimal width,
      * and taking into account the zoom level, the current offset is the
      * position of the left border of the screen in this big picture
      */
     private float currentXOffset = 0;
-
     /**
      * If you picture all the pages side by side in their optimal width,
      * and taking into account the zoom level, the current offset is the
      * position of the left border of the screen in this big picture
      */
     private float currentYOffset = 0;
-
     /**
      * The zoom level, always >= 1
      */
     private float zoom = 1f;
-
     /**
      * True if the PDFView has been recycled
      */
     private boolean recycled = true;
-
     /**
      * Current state of the view
      */
     private State state = State.DEFAULT;
-
     /**
      * Async task used during the loading phase to decode a PDF document
      */
     private DecodingAsyncTask decodingAsyncTask;
-
-    /**
-     * The thread {@link #renderingHandler} will run on
-     */
-    private final HandlerThread renderingHandlerThread;
-    /**
-     * Handler always waiting in the background and rendering tasks
-     */
-    RenderingHandler renderingHandler;
-
     private PagesLoader pagesLoader;
-
     /**
      * Call back object to call when the PDF is loaded
      */
     private OnLoadCompleteListener onLoadCompleteListener;
-
     private OnErrorListener onErrorListener;
-
     /**
      * Call back object to call when the page has changed
      */
     private OnPageChangeListener onPageChangeListener;
-
     /**
      * Call back object to call when the page is scrolled
      */
     private OnPageScrollListener onPageScrollListener;
-
     /**
      * Call back object to call when the above layer is to drawn
      */
     private OnDrawListener onDrawListener;
-
     private OnDrawListener onDrawAllListener;
-
     /**
      * Call back object to call when the document is initially rendered
      */
     private OnRenderListener onRenderListener;
-
     /**
      * Call back object to call when the user does a tap gesture
      */
     private OnTapListener onTapListener;
-
     /**
      * Call back object to call when the page load error occurs
      */
     private OnPageErrorListener onPageErrorListener;
-
     /**
      * Paint object for drawing
      */
     private Paint paint;
-
     /**
      * Paint object for drawing debug stuff
      */
     private Paint debugPaint;
-
     /**
      * Paint used for invalid pages
      */
     private int invalidPageColor = Color.WHITE;
-
     private int defaultPage = 0;
-
     /**
      * True if should scroll through pages vertically instead of horizontally
      */
     private boolean swipeVertical = true;
-
     /**
      * Pdfium core for loading and rendering PDFs
      */
     private PdfiumCore pdfiumCore;
-
     private PdfDocument pdfDocument;
-
     private ScrollHandle scrollHandle;
-
     private boolean isScrollHandleInit = false;
-
-    ScrollHandle getScrollHandle() {
-        return scrollHandle;
-    }
-
     /**
      * True if bitmap should use ARGB_8888 format and take more memory
      * False if bitmap should be compressed by using RGB_565 format and take less memory
      */
     private boolean bestQuality = false;
-
     /**
      * True if annotations should be rendered
      * False otherwise
      */
     private boolean annotationRendering = false;
-
     /**
      * True if the view should render during scaling<br/>
      * Can not be forced on older API versions (< Build.VERSION_CODES.KITKAT) as the GestureDetector does
@@ -301,23 +245,20 @@ public class PDFView extends RelativeLayout {
      * False otherwise
      */
     private boolean renderDuringScale = false;
-
     /**
      * Antialiasing and bitmap filtering
      */
     private boolean enableAntialiasing = true;
-    private PaintFlagsDrawFilter antialiasFilter =
+    private final PaintFlagsDrawFilter antialiasFilter =
             new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-
     /**
      * Spacing between pages, in DP
      */
     private int spacingPx = 0;
-
     /**
      * pages numbers used when calling onDrawAllListener
      */
-    private List<Integer> onDrawPagesNums = new ArrayList<>(10);
+    private final List<Integer> onDrawPagesNums = new ArrayList<>(10);
 
     /**
      * Construct the initial view
@@ -341,6 +282,14 @@ public class PDFView extends RelativeLayout {
 
         pdfiumCore = new PdfiumCore(context);
         setWillNotDraw(false);
+    }
+
+    ScrollHandle getScrollHandle() {
+        return scrollHandle;
+    }
+
+    private void setScrollHandle(ScrollHandle scrollHandle) {
+        this.scrollHandle = scrollHandle;
     }
 
     private void load(DocumentSource docSource, String password, OnLoadCompleteListener listener, OnErrorListener onErrorListener) {
@@ -445,6 +394,10 @@ public class PDFView extends RelativeLayout {
         return MathUtils.limit(offset, 0, 1);
     }
 
+    public void setPositionOffset(float progress) {
+        setPositionOffset(progress, true);
+    }
+
     /**
      * @param progress   must be between 0 and 1
      * @param moveHandle whether to move scroll handle
@@ -457,10 +410,6 @@ public class PDFView extends RelativeLayout {
             moveTo((-calculateDocLength() + getWidth()) * progress, currentYOffset, moveHandle);
         }
         loadPageByOffset();
-    }
-
-    public void setPositionOffset(float progress) {
-        setPositionOffset(progress, true);
     }
 
     private float calculatePageOffset(int page) {
@@ -499,36 +448,36 @@ public class PDFView extends RelativeLayout {
         this.dragPinchManager.enableDoubletap(enableDoubletap);
     }
 
-    private void setOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
-        this.onPageChangeListener = onPageChangeListener;
-    }
-
     OnPageChangeListener getOnPageChangeListener() {
         return this.onPageChangeListener;
     }
 
-    private void setOnPageScrollListener(OnPageScrollListener onPageScrollListener) {
-        this.onPageScrollListener = onPageScrollListener;
+    private void setOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
+        this.onPageChangeListener = onPageChangeListener;
     }
 
     OnPageScrollListener getOnPageScrollListener() {
         return this.onPageScrollListener;
     }
 
-    private void setOnRenderListener(OnRenderListener onRenderListener) {
-        this.onRenderListener = onRenderListener;
+    private void setOnPageScrollListener(OnPageScrollListener onPageScrollListener) {
+        this.onPageScrollListener = onPageScrollListener;
     }
 
     OnRenderListener getOnRenderListener() {
         return this.onRenderListener;
     }
 
-    private void setOnTapListener(OnTapListener onTapListener) {
-        this.onTapListener = onTapListener;
+    private void setOnRenderListener(OnRenderListener onRenderListener) {
+        this.onRenderListener = onRenderListener;
     }
 
     OnTapListener getOnTapListener() {
         return this.onTapListener;
+    }
+
+    private void setOnTapListener(OnTapListener onTapListener) {
+        this.onTapListener = onTapListener;
     }
 
     private void setOnDrawListener(OnDrawListener onDrawListener) {
@@ -630,17 +579,12 @@ public class PDFView extends RelativeLayout {
         if (swipeVertical) {
             if (direction < 0 && currentXOffset < 0) {
                 return true;
-            } else if (direction > 0 && currentXOffset + toCurrentScale(optimalPageWidth) > getWidth()) {
-                return true;
-            }
+            } else return direction > 0 && currentXOffset + toCurrentScale(optimalPageWidth) > getWidth();
         } else {
             if (direction < 0 && currentXOffset < 0) {
                 return true;
-            } else if (direction > 0 && currentXOffset + calculateDocLength() > getWidth()) {
-                return true;
-            }
+            } else return direction > 0 && currentXOffset + calculateDocLength() > getWidth();
         }
-        return false;
     }
 
     @Override
@@ -648,17 +592,12 @@ public class PDFView extends RelativeLayout {
         if (swipeVertical) {
             if (direction < 0 && currentYOffset < 0) {
                 return true;
-            } else if (direction > 0 && currentYOffset + calculateDocLength() > getHeight()) {
-                return true;
-            }
+            } else return direction > 0 && currentYOffset + calculateDocLength() > getHeight();
         } else {
             if (direction < 0 && currentYOffset < 0) {
                 return true;
-            } else if (direction > 0 && currentYOffset + toCurrentScale(optimalPageHeight) > getHeight()) {
-                return true;
-            }
+            } else return direction > 0 && currentYOffset + toCurrentScale(optimalPageHeight) > getHeight();
         }
-        return false;
     }
 
     @Override
@@ -1255,10 +1194,6 @@ public class PDFView extends RelativeLayout {
         animationManager.startZoomAnimation(getWidth() / 2, getHeight() / 2, zoom, scale);
     }
 
-    private void setScrollHandle(ScrollHandle scrollHandle) {
-        this.scrollHandle = scrollHandle;
-    }
-
     /**
      * Get page number at given offset
      *
@@ -1338,12 +1273,12 @@ public class PDFView extends RelativeLayout {
         this.spacingPx = Util.getDP(getContext(), spacing);
     }
 
-    private void setInvalidPageColor(int invalidPageColor) {
-        this.invalidPageColor = invalidPageColor;
-    }
-
     public int getInvalidPageColor() {
         return invalidPageColor;
+    }
+
+    private void setInvalidPageColor(int invalidPageColor) {
+        this.invalidPageColor = invalidPageColor;
     }
 
     public boolean doRenderDuringScale() {
@@ -1404,6 +1339,15 @@ public class PDFView extends RelativeLayout {
      */
     public Configurator fromSource(DocumentSource docSource) {
         return new Configurator(docSource);
+    }
+
+    /**
+     * START - scrolling in first page direction
+     * END - scrolling in last page direction
+     * NONE - not scrolling
+     */
+    enum ScrollDir {
+        NONE, START, END
     }
 
     private enum State {DEFAULT, LOADED, SHOWN, ERROR}

@@ -20,17 +20,15 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     private final static int HANDLE_LONG = 65;
     private final static int HANDLE_SHORT = 40;
     private final static int DEFAULT_TEXT_SIZE = 16;
-
-    private float relativeHandlerMiddle = 0f;
-
     protected TextView textView;
     protected Context context;
-    private boolean inverted;
+    private float relativeHandlerMiddle = 0f;
+    private final boolean inverted;
     private PDFView pdfView;
     private float currentPos;
 
-    private Handler handler = new Handler();
-    private Runnable hidePageScrollerRunnable = new Runnable() {
+    private final Handler handler = new Handler();
+    private final Runnable hidePageScrollerRunnable = new Runnable() {
         @Override
         public void run() {
             hide();
