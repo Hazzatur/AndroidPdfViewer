@@ -13,7 +13,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 3
-        versionName = "2.0.0"
+        versionName = "3.0.0"
     }
 
     compileOptions {
@@ -24,15 +24,11 @@ android {
     kotlinOptions {
         jvmTarget = "21"
     }
-
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 dependencies {
     implementation(project(":android-pdf-viewer"))
-    implementation("com.android.support:appcompat-v7:28.0.0")
-    kapt("org.androidannotations:androidannotations:4.8.0")
-    kapt("org.androidannotations:androidannotations-api:4.8.0")
+    implementation(libs.appcompat)
+    implementation(libs.core.ktx)
+    implementation(libs.pdfium.android)
 }

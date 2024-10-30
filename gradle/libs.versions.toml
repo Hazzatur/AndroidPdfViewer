@@ -1,0 +1,9 @@
+[versions]
+appcompat = "1.7.0"
+coreKtx = "1.15.0"
+pdfiumAndroid = "1.9.0"
+
+[libraries]
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+pdfium-android = { module = "com.github.barteksc:pdfium-android", version.ref = "pdfiumAndroid" }

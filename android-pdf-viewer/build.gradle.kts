@@ -28,10 +28,6 @@ android {
             manifest.srcFile("src/main/AndroidManifest.xml")
         }
     }
-
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 tasks.register<Jar>("sourceJar") {
@@ -59,5 +55,6 @@ afterEvaluate {
 }
 
 dependencies {
-    implementation("com.github.barteksc:pdfium-android:1.9.0")
+    implementation(libs.pdfium.android)
+    implementation(libs.core.ktx)
 }
