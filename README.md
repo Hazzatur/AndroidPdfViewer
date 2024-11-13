@@ -5,11 +5,11 @@ and `double-tap`. It is based on [PdfiumAndroid](https://github.com/barteksc/Pdf
 decoding PDF files, compatible with API 26 (Android 8.0) and higher. Licensed under Apache License
 2.0.
 
-## What’s New in Version 3.0.0
+## What’s New in Version 3.0.3
 
 * **Migration to Kotlin**: The core library and sample have been migrated to Kotlin, with Gradle
   files updated to KTS.
-* **Updated Targets**: JavaVersion.VERSION_21, minSdk = 26, and targetSdk = 35.
+* **Updated Targets**: JavaVersion.VERSION_17, minSdk = 26, and targetSdk = 35.
 * **Refactored Naming Conventions**: Revised the `Configurator` class and others for improved
   clarity and style consistency.
 
@@ -28,7 +28,7 @@ decoding PDF files, compatible with API 26 (Android 8.0) and higher. Licensed un
 Add the following to your project’s `build.gradle`:
 
 ```kotlin
-implementation 'com.github.hazzatur:android-pdf-viewer:3.0.0'
+implementation("com.github.Hazzatur:AndroidPdfViewer:3.0.3")
 ```
 
 ## Include PDFView in Your Layout

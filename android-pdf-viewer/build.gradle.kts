@@ -13,12 +13,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = "17"
     }
 
     sourceSets {
@@ -48,13 +48,13 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.hazzatur"
                 artifactId = "android-pdf-viewer"
-                version = "3.0.0"
+                version = "3.0.3"
             }
         }
     }
 }
 
 dependencies {
-    implementation(libs.pdfium.android)
+    api(libs.pdfium.android)
     implementation(libs.core.ktx)
 }

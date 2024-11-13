@@ -2,7 +2,6 @@ package com.github.barteksc.pdfviewer.source
 
 import android.content.Context
 import android.net.Uri
-import android.os.ParcelFileDescriptor
 import com.shockwave.pdfium.PdfDocument
 import com.shockwave.pdfium.PdfiumCore
 import java.io.IOException
@@ -15,7 +14,9 @@ class UriSource(private val uri: Uri) : DocumentSource {
         core: PdfiumCore,
         password: String?
     ): PdfDocument {
-        val pfd: ParcelFileDescriptor? = context.contentResolver.openFileDescriptor(uri, "r")
-        return core.newDocument(pfd, password)
+        context.contentResolver.openFileDescriptor(uri, "r")?.let {
+            return core.newDocument(it, password)
+        }
+        throw IOException("Cannot open document")
     }
 }
