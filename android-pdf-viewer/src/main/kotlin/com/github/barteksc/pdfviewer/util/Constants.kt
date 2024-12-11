@@ -28,7 +28,7 @@ object Constants {
          */
         var CACHE_SIZE: Int = 120
 
-        var THUMBNAILS_CACHE_SIZE: Int = 6
+        var THUMBNAILS_CACHE_SIZE: Int = 120
     }
 
     object Pinch {

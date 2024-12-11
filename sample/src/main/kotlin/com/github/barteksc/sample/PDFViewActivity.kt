@@ -25,7 +25,7 @@ class PDFViewActivity : AppCompatActivity(), OnPageChangeListener, OnLoadComplet
 
     companion object {
         private const val TAG = "PDFViewActivity"
-        private const val SAMPLE_FILE = "sample.pdf"
+        private const val SAMPLE_FILE = "alice.pdf"
     }
 
     private lateinit var pdfView: PDFView

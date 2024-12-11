@@ -2,6 +2,7 @@ package com.github.barteksc.pdfviewer.model
 
 import android.graphics.Bitmap
 import android.graphics.RectF
+import kotlin.math.abs
 
 data class PagePart(
     val userPage: Int,
@@ -20,23 +21,29 @@ data class PagePart(
 
         return other.page == page &&
                 other.userPage == userPage &&
-                other.width == width &&
-                other.height == height &&
-                other.pageRelativeBounds.left == pageRelativeBounds.left &&
-                other.pageRelativeBounds.right == pageRelativeBounds.right &&
-                other.pageRelativeBounds.top == pageRelativeBounds.top &&
-                other.pageRelativeBounds.bottom == pageRelativeBounds.bottom
+                abs(other.width - width) < EPSILON &&
+                abs(other.height - height) < EPSILON &&
+                abs(other.pageRelativeBounds.left - pageRelativeBounds.left) < EPSILON &&
+                abs(other.pageRelativeBounds.right - pageRelativeBounds.right) < EPSILON &&
+                abs(other.pageRelativeBounds.top - pageRelativeBounds.top) < EPSILON &&
+                abs(other.pageRelativeBounds.bottom - pageRelativeBounds.bottom) < EPSILON
     }
 
     override fun hashCode(): Int {
         var result = userPage
         result = 31 * result + page
-        result = 31 * result + renderedBitmap.hashCode()
         result = 31 * result + width.hashCode()
         result = 31 * result + height.hashCode()
-        result = 31 * result + pageRelativeBounds.hashCode()
+        result = 31 * result + pageRelativeBounds.left.hashCode()
+        result = 31 * result + pageRelativeBounds.right.hashCode()
+        result = 31 * result + pageRelativeBounds.top.hashCode()
+        result = 31 * result + pageRelativeBounds.bottom.hashCode()
         result = 31 * result + thumbnail.hashCode()
         result = 31 * result + cacheOrder
         return result
+    }
+
+    companion object {
+        private const val EPSILON = 0.0001f
     }
 }

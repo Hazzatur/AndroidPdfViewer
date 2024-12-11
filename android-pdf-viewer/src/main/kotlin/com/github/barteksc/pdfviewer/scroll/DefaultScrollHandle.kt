@@ -20,7 +20,7 @@ class DefaultScrollHandle @JvmOverloads constructor(
     private val inverted: Boolean = false
 ) : RelativeLayout(context), ScrollHandle {
 
-    private val textView: TextView = TextView(context).apply { visibility = INVISIBLE }
+    private val textView: TextView = TextView(context)
     private var relativeHandlerMiddle = 0f
     private lateinit var pdfView: PDFView
     private var currentPos = 0f
@@ -83,19 +83,22 @@ class DefaultScrollHandle @JvmOverloads constructor(
 
     override fun setScroll(position: Float) {
         if (!shown()) show() else handler.removeCallbacks(hidePageScrollerRunnable)
-        setPosition(
-            ((if (pdfView.swipeVertical) pdfView.height else pdfView.width).toFloat())
-        )
+        val pdfViewSize = if (pdfView.swipeVertical) pdfView.height else pdfView.width
+        setPosition(position * pdfViewSize)
     }
 
     private fun setPosition(pos: Float) {
-        val pdfViewSize =
-            if (pdfView.swipeVertical) pdfView.height else pdfView.width
-        var adjustedPos = pos - relativeHandlerMiddle
-        adjustedPos =
-            adjustedPos.coerceIn(0f, pdfViewSize - Util.getDP(context, HANDLE_SHORT).toFloat())
+        if (pos.isNaN() || pos.isInfinite()) return
 
-        if (pdfView.swipeVertical) y = adjustedPos else x = adjustedPos
+        val pdfViewSize = if (pdfView.swipeVertical) pdfView.height else pdfView.width
+        val adjustedPos = (pos - relativeHandlerMiddle)
+            .coerceIn(0f, pdfViewSize - Util.getDP(context, HANDLE_SHORT).toFloat())
+
+        if (pdfView.swipeVertical) {
+            y = adjustedPos
+        } else {
+            x = adjustedPos
+        }
 
         calculateMiddle()
         invalidate()
@@ -105,7 +108,7 @@ class DefaultScrollHandle @JvmOverloads constructor(
         val pos = if (pdfView.swipeVertical) y else x
         val viewSize = if (pdfView.swipeVertical) height else width
         val pdfViewSize = if (pdfView.swipeVertical) pdfView.height else pdfView.width
-        relativeHandlerMiddle = (pos + relativeHandlerMiddle) / pdfViewSize * viewSize
+        relativeHandlerMiddle = (pos + viewSize / 2) / pdfViewSize
     }
 
     override fun hideDelayed() {
@@ -114,7 +117,7 @@ class DefaultScrollHandle @JvmOverloads constructor(
 
     override fun setPageNum(pageNum: Int) {
         val text = pageNum.toString()
-        if (textView.text != text) textView.text = text
+        textView.text = text
     }
 
     override fun shown(): Boolean = visibility == VISIBLE
