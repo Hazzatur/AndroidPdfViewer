@@ -48,7 +48,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.hazzatur"
                 artifactId = "android-pdf-viewer"
-                version = "3.0.4"
+                version = "3.0.5"
             }
         }
     }

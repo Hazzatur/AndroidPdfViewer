@@ -7,7 +7,7 @@ object Constants {
     /**
      * Between 0 and 1, the thumbnails quality (default 0.3). Increasing this value may cause performance decrease
      */
-    var THUMBNAIL_RATIO: Float = 0.3f
+    var THUMBNAIL_RATIO: Float = 0.7f
 
     /**
      * The size of the rendered parts (default 256)
@@ -19,7 +19,7 @@ object Constants {
     /**
      * Number of preloaded rows or columns
      */
-    var PRELOAD_COUNT: Int = 1
+    var PRELOAD_COUNT: Int = 3
 
     object Cache {
 

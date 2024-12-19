@@ -668,12 +668,10 @@ class PDFView(
             (offsetY + height).toInt().toFloat()
         )
 
-        // Check if the bitmap is on the screen
-        val translationX = currentXOffset + localTranslationX
-        val translationY = currentYOffset + localTranslationY
-        if (translationX + dstRect.left >= width || translationX + dstRect.right <= 0 ||
-            translationY + dstRect.top >= height || translationY + dstRect.bottom <= 0
-        ) {
+        val partOnScreenHorizontally = (translationX + dstRect.right > 0) && (translationX + dstRect.left < width)
+        val partOnScreenVertically = (translationY + dstRect.bottom > 0) && (translationY + dstRect.top < height)
+
+        if (!partOnScreenHorizontally || !partOnScreenVertically) {
             canvas.translate(-localTranslationX, -localTranslationY)
             return
         }
