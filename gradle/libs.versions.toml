@@ -1,9 +1,13 @@
 [versions]
-appcompat = "1.7.0"
-coreKtx = "1.15.0"
-pdfiumAndroid = "2.0.1"
+agp = "8.8.0"
+kotlin = "2.1.10"
 
 [libraries]
-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
-pdfium-android = { module = "com.github.Hazzatur:PdfiumAndroid", version.ref = "pdfiumAndroid" }
+appcompat = "androidx.appcompat:appcompat:1.7.0"
+core-ktx = "androidx.core:core-ktx:1.15.0"
+pdfium-android = "com.github.Hazzatur:PdfiumAndroid:2.0.2"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
